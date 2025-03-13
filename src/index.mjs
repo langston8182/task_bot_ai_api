@@ -1,13 +1,14 @@
 import { addTask, deleteTask } from './controllers/task_controller.mjs';
 
-export const lambdaHandler = async (event) => {
+export const handler = async (event) => {
     try {
+        const env = process.env.ENVIRONMENT || "preprod";
         const httpMethod = event.requestContext.http.method;
         const path = event.requestContext.http.path;
 
-        if (httpMethod === "POST" && path === "/tasks") {
+        if (httpMethod === "POST" && path.startsWith(`/${env}/tasks`)) {
             return await addTask(event);
-        } else if (httpMethod === "DELETE" && path.startsWith("/tasks/")) {
+        } else if (httpMethod === "DELETE" && path.startsWith(`/${env}/tasks/`)) {
             const taskId = path.split('/').pop();
             return await deleteTask(taskId);
         } else {
